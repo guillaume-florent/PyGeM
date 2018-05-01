@@ -1,5 +1,26 @@
+/.idea
+
 # mac file systems
 .DS_Store
 
 # compiled python codes
 *.pyc
+/examples/example_hull_stl/params.vtk
+/examples/example_hull_stl/params_deformed.vtk
+/examples/example_hull_stl/SYSSER01_Z0WL_mod.stl
+/examples/example_hull_step/params.vtk
+/examples/example_hull_step/params_deformed.vtk
+/examples/example_hull_step/SYSSER01_Z0WL_mod.stp
+/examples/example_hull_iges/params.vtk
+/examples/example_hull_iges/params_deformed.vtk
+/examples/example_hull_iges/SYSSER01_Z0WL_mod.igs
+/examples/example_ffd_step/test_pipe_mod.step
+/examples/tutorial_1_stl/params.vtk
+/examples/tutorial_1_stl/params_deformed.vtk
+/examples/tutorial_1_stl/test_sphere_mod.stl
+/examples/tutorial_1_stl/test_sphere_null.stl
+/examples/tutorial_2_iges/test_pipe_mod.iges
+/examples/tutorial_3_unv/test_pipe_mod_C0.unv
+/examples/tutorial_3_unv/test_pipe_mod_C1.unv
+/examples/tutorial_4_rbf/points.vtp
+/tests/test.prm

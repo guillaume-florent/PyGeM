@@ -600,14 +600,14 @@ class NurbsHandler(fh.FileHandler):
         if shell_fixer.Perform():
             print("{} shells fixed! ".format(shell_fixer.NbShells()))
         else:
-            print "Shells not fixed! "
+            print("Shells not fixed! ")
 
         new_shell = shell_fixer.Shell()
 
         if brepalgo_IsValid(new_shell):
-            print "Shell valid! "
+            print("Shell valid! ")
         else:
-            print "Shell failed! "
+            print("Shell failed! ")
 
         return new_shell
 
@@ -623,6 +623,7 @@ class NurbsHandler(fh.FileHandler):
         :return: None
 
         """
+
         self.outfile = filename
         # global compound containing multiple shells
         global_compound_builder = BRep_Builder()
@@ -663,7 +664,7 @@ class NurbsHandler(fh.FileHandler):
                 global_compound_builder.Add(global_comp, new_shell)
 
                 print("Shell {0} of type {1} Processed ".format(ishell, itype))
-                print "=============================================="
+                print("==============================================")
 
                 ishell += 1
                 shape_shells_explorer.Next()
@@ -695,7 +696,7 @@ class NurbsHandler(fh.FileHandler):
             global_compound_builder.Add(global_comp, new_shell)
 
             print("Shell {0} of type {1} Processed ".format(0, itype))
-            print "=============================================="
+            print("==============================================")
 
         self.write_shape_to_file(global_comp, self.outfile)
 

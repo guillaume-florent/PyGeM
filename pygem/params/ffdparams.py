@@ -443,3 +443,110 @@ class FFDParameters(object):
         self.array_mu_x.fill(0.0)
         self.array_mu_y.fill(0.0)
         self.array_mu_z.fill(0.0)
+
+    @classmethod
+    def null_morphing_box(cls,
+                          n_control_points,
+                          length_box,
+                          origin_box,
+                          rot_angle=None):
+        r"""Constructor of an FFD morphing box with zero displacements
+
+        :param list n_control_points: number of control points
+            in the x, y, and z direction.
+        :param list length_box: length of the box
+            in the x, y, and z direction.
+        :param list origin_box: position of the box origin
+            in the x, y, and z direction.
+        :param list rot_angle: rotation angle
+            around the x, y, and z axis. [0., 0., 0.] by default
+
+        :return: FFDParameters with specified geometry and 0 displacements
+        :rtype: FFDParameters
+
+        """
+        if rot_angle is None:
+            rot_angle = [0., 0., 0.]
+        p = cls(n_control_points)
+        p.lenght_box = np.array(length_box)
+        p.origin_box = np.array(origin_box)
+        p.rot_angle = np.array(rot_angle)
+        p.array_mu_x = np.zeros(n_control_points)
+        p.array_mu_y = np.zeros(n_control_points)
+        p.array_mu_z = np.zeros(n_control_points)
+
+        # p.rotation_matrix = at.angles2matrix(radians(p.rot_angle[2]),
+        #                                      radians(p.rot_angle[1]),
+        #                                      radians(p.rot_angle[0]))
+
+        p.position_vertex_0 = p.origin_box
+        p.position_vertex_1 = p.position_vertex_0 + \
+                              np.dot(p.rotation_matrix,
+                                     [p.lenght_box[0], 0, 0])
+        p.position_vertex_2 = p.position_vertex_0 + \
+                              np.dot(p.rotation_matrix,
+                                     [0, p.lenght_box[1], 0])
+        p.position_vertex_3 = p.position_vertex_0 + \
+                              np.dot(p.rotation_matrix,
+                                     [0, 0, p.lenght_box[2]])
+
+        # p.psi_mapping = np.diag(1. / p.lenght_box)
+        # p.inv_psi_mapping = np.diag(p.lenght_box)
+
+        return p
+
+    def move_point(self, i, j, k, direction, displacement, symmetry=None):
+        r"""Move point of index [i][j][k] by displacement in the specified
+        direction
+
+        :param int i: x index
+        :param int j: y index
+        :param int k: z index
+        :param char direction: direction of movement (X Y or Z)
+        :param float displacement: value of displacement (normed against box
+            dimensions)
+        :param str symmetry: symmetry enforcement parameter (None means no
+            symmetry enforcement)
+
+        """
+
+        def symmetric_index(index, list_length):
+            mid = (list_length - 1) / 2
+            delta = index - mid
+            return int(mid - delta)
+
+        mu_dir = {"X": self.array_mu_x,
+                  "Y": self.array_mu_y,
+                  "Z": self.array_mu_z}
+
+        mu_dir[direction][i][j][k] = displacement
+
+        if symmetry is not None:
+            if symmetry in ["XY", "YX"]:
+                if direction == "Z" and k == symmetric_index(k,
+                                                             self.n_control_points[
+                                                                 2]):
+                    raise ValueError("Cannot move the center point in "
+                                     "opposite Z directions at the same time")
+                mu_dir[direction][i][j][symmetric_index(k,
+                                                        self.n_control_points[
+                                                            2])] = -displacement if direction == "Z" else displacement
+            elif symmetry in ["XZ", "ZX"]:
+                if direction == "Y" and j == symmetric_index(j,
+                                                             self.n_control_points[
+                                                                 1]):
+                    raise ValueError("Cannot move the center point in "
+                                     "opposite Y directions at the same time")
+                mu_dir[direction][i][
+                    symmetric_index(j, self.n_control_points[1])][
+                    k] = -displacement if direction == "Y" else displacement
+            elif symmetry in ["YZ", "ZY"]:
+                if direction == "X" and i == symmetric_index(i,
+                                                             self.n_control_points[
+                                                                 0]):
+                    raise ValueError("Cannot move the center point in "
+                                     "opposite X directions at the same time")
+                mu_dir[direction][symmetric_index(i, self.n_control_points[0])][
+                    j][k] = -displacement if direction == "X" else displacement
+            else:
+                raise ValueError("Unknown symmetry")
